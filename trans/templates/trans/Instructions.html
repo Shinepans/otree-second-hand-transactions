@@ -1,0 +1,27 @@
+{% extends "global/Page.html" %}
+{% load staticfiles otree %}
+
+{% block title %}
+    Trans - Welcome: {{name}}
+
+{% endblock %}
+
+{% block content %}
+    <ol type="a" class="list-group">
+        <li class="list-group-item">
+            Trans something that you did not need anymore and get some money from them
+        </li>
+        <li class="list-group-item">
+            Or you can by something you like by some money of your
+        </li>
+        <li class="list-group-item">
+            You can chat to exchange your needs
+        </li>
+        <li class="list-group-item">
+            Everyone has different initial money,goods which is produced by PC randomly
+        </li>
+    </ol>
+    <div class="mt-3">
+        {% next_button %}
+    </div>
+{% endblock %}
