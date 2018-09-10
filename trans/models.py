@@ -13,7 +13,7 @@ class Constants(BaseConstants):
 
     # otree structs vars
     name_in_url = 'trans'
-    players_per_group = 2
+    players_per_group = 4
     num_rounds = 1
 
 class Subsession(BaseSubsession):

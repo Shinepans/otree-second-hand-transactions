@@ -14,6 +14,8 @@ SESSION_CONFIG_DEFAULTS = {
     'doc': "",
 }
 
+CHANNEL_ROUTING = 'routing.channel_routing'
+
 SESSION_CONFIGS = [
     {
         'name': 'trans',
