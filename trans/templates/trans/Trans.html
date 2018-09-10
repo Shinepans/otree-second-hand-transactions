@@ -1,0 +1,39 @@
+{% extends "global/Page.html" %}
+{% load staticfiles otree %}
+
+{% block title %}
+Trans - Playing: {{name}}
+
+{% endblock %}
+
+{% block content %}
+<head>
+    <style>
+        .main {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .goods {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+        .goods_title {
+            font-size: 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+    </style>
+</head>
+
+<div class="main">
+    <div class="goods">
+        <div class="goods_title">
+            You own goods:
+        </div>
+    </div>
+</div>
+{% endblock %}
