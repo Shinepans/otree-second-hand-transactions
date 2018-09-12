@@ -66,6 +66,11 @@ class ExConsumer(JsonWebsocketConsumer):
                     'my_goods': findGoods(pid)
                 })})
         if content['action'] == 'buy_goods':
-            pass
+            this_player = Player.objects.get(participant_id=content['id'])
+            this_player_goods_array = decode_goods_idx(this_player.goods_id)
+            this_player_goods_array.append(goods_item['id'])
+            this_player.goods_id = encode_goods_idx(this_player_goods_array)
+            # TODO find owner; dec my fee, inc his fee
+            this_player.save()
         pass
 
