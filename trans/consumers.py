@@ -1,9 +1,11 @@
 from channels.generic.websockets import JsonWebsocketConsumer
 from pprint import pprint
 import json
+from .models import Player
+from .goods_conf import goods
 
 replychannels = {}
-
+goods_list = []
 
 class ExConsumer(JsonWebsocketConsumer):
 
@@ -34,12 +36,17 @@ class ExConsumer(JsonWebsocketConsumer):
         self.post_receive(content, **kwargs)
 
     def post_receive(self, content, pid, pk):
-        pprint(content)
-        pprint(pid)
-        pprint(pk)
-        replychannels[str(pid)].send({'text': json.dumps({
-            'msg': 'got msg',
-            'back': 'new msg'
-        })})
+        if content['action'] == 'sell_or_buy':
+            global goods_list
+            all_players_id = [content['id']]
+            goods_item = goods[int(content['goods_id'])]
+            goods_list.append(goods_item)
+            for p in Player.get_others_in_group(Player.objects.get(participant_id=content['id'])):
+                all_players_id.append(p.id)
+            for id in all_players_id:
+                replychannels[str(id)].send({'text': json.dumps({
+                    'action': 'syn_sell_list',
+                    'sell_list': goods_list
+                })})
         pass
 

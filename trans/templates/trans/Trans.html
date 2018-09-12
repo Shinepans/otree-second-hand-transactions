@@ -151,7 +151,7 @@ Trans - Playing: {{name}} | Fee Left: ¥ {{fee}}
                     ¥ {{g.price}}
                 </div>
                 <div class="goods_action">
-                    <div class="sell-btn" onclick="test()">
+                    <div class="sell-btn" onclick="actions('{{g.id}}')">
                         Sell out
                     </div>
                 </div>
@@ -200,10 +200,10 @@ Trans - Playing: {{name}} | Fee Left: ¥ {{fee}}
     };
 
 
-
-    function test() {
-        var pid = "{{pid}}"
-        var msg = {id:pid, action: 'do something'};
+    // Those who wants to sell goods
+    function actions(id) {
+        var pid = "{{pid}}";
+        var msg = {id:pid, action: 'sell_or_buy', goods_id: id};
         if (socket.readyState === socket.OPEN) {
             console.log('send msg:',msg);
             socket.send(JSON.stringify(msg));
