@@ -111,8 +111,9 @@ Trans - Playing: {{name}} | Fee Left: ¥ {{fee}}
             font-size: 1.5rem;
             font-weight: bold;
             margin-right: 1.2rem;
-            justify-content: center;
-            align-items: flex-start;
+            justify-content: flex-start;
+            align-items: center;
+            flex-direction: column;
             box-shadow: rgba(39, 131, 235, 0.1) 0 5px 10px;
             overflow-y: scroll;
         }
@@ -129,6 +130,14 @@ Trans - Playing: {{name}} | Fee Left: ¥ {{fee}}
         }
         .chat_for_sell {
             width: 100%;
+        }
+        .sell_list_item {
+            position: relative;
+            width: 100%;
+            font-size: 1rem;
+            height: 4rem;
+            border-bottom: solid 1px #eee;
+            margin-top: 0.5rem;
         }
 
 
@@ -160,7 +169,7 @@ Trans - Playing: {{name}} | Fee Left: ¥ {{fee}}
         </div>
         <div class="trans_block">
             <div class="trans_sell_list_block">
-                <div class="trans_sell_list_block_title">
+                <div id="sell_list" class="trans_sell_list_block_title">
                     Sell List:
                 </div>
             </div>
@@ -175,7 +184,7 @@ Trans - Playing: {{name}} | Fee Left: ¥ {{fee}}
         </div>
     </div>
 </div>
-
+<script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
 <script>
     var pid = "{{pid}}";
     var pk = "{{pk}}"
@@ -194,6 +203,15 @@ Trans - Playing: {{name}} | Fee Left: ¥ {{fee}}
     socket.onmessage = function (event) {
         var obj = jQuery.parseJSON(event.data);
         console.log('new msg:', obj);
+        if(obj.action == 'syn_sell_list') {
+            sell_list = obj.sell_list
+            $("div").remove(".sell_list_item")
+            for(var idx=0;idx<sell_list.length;idx++) {
+                $('#sell_list').after("<div class='sell_list_item'><span style='color:#333'>"
+                + sell_list[idx].name + "</span><span style='color:#4caf50;position:absolute;right:6rem'>¥ " + sell_list[idx].price +
+                "</span><a onclick='buy(" + sell_list[idx].id + ")' style='color:#2196f3;position: absolute;right: 2rem;'>Buy it</a></div>")
+            }
+        }
     };
     socket.onclose = function (event) {
         console.log('disconnected from oTree');
@@ -209,6 +227,7 @@ Trans - Playing: {{name}} | Fee Left: ¥ {{fee}}
             socket.send(JSON.stringify(msg));
         }
     }
+
 
 </script>
 
