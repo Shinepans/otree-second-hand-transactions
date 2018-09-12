@@ -40,7 +40,8 @@ class ExConsumer(JsonWebsocketConsumer):
             global goods_list
             all_players_id = [content['id']]
             goods_item = goods[int(content['goods_id'])]
-            goods_list.append(goods_item)
+            if goods_item not in goods_list:
+                goods_list.append(goods_item)
             for p in Player.get_others_in_group(Player.objects.get(participant_id=content['id'])):
                 all_players_id.append(p.id)
             for id in all_players_id:
