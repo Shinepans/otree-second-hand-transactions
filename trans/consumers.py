@@ -1,24 +1,25 @@
 from channels.generic.websockets import JsonWebsocketConsumer
+from pprint import pprint
+import json
 
 replychannels = {}
-
-# TODO
 
 
 class ExConsumer(JsonWebsocketConsumer):
 
-    def clean_kwargs(self, player_id, pk):
+    def clean_kwargs(self, pid, pk):
         return {
-            'player_id': player_id,
+            'pid': pid,
             'pk': pk
         }
 
     def connect(self, message, **kwargs):
         kwargs = self.clean_kwargs(**kwargs)
-        replychannels[kwargs['player_id']] = message.reply_channel
+        replychannels[kwargs['pid']] = message.reply_channel
         self.post_connect(**kwargs)
 
     def post_connect(self, **kwargs):
+        pprint(self)
         pass
 
     def disconnect(self, message, **kwargs):
@@ -32,6 +33,13 @@ class ExConsumer(JsonWebsocketConsumer):
         kwargs = self.clean_kwargs(**kwargs)
         self.post_receive(content, **kwargs)
 
-    def post_receive(self, content, player_id, pk):
+    def post_receive(self, content, pid, pk):
+        pprint(content)
+        pprint(pid)
+        pprint(pk)
+        replychannels[str(pid)].send({'text': json.dumps({
+            'msg': 'got msg',
+            'back': 'new msg'
+        })})
         pass
 

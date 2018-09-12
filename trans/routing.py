@@ -1,8 +1,9 @@
-from channels.routing import route
-from myapp.consumers import ws_add, ws_disconnect
+from trans.consumers import ExConsumer
 from otree.channels.routing import channel_routing
+from channels.routing import route_class
+
+ex_path = r"^/ex/(?P<pid>\w+)/(?P<pk>\w+)$"
 
 channel_routing += [
-    route("websocket.connect", ws_add, path=r"^/chat"),
-    route("websocket.disconnect", ws_disconnect, path=r"^/chat"),
+    route_class(ExConsumer, path=ex_path),
 ]

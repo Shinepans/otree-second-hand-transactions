@@ -132,6 +132,7 @@ Trans - Playing: {{name}} | Fee Left: ¥ {{fee}}
         }
 
 
+
     </style>
 </head>
 
@@ -150,7 +151,7 @@ Trans - Playing: {{name}} | Fee Left: ¥ {{fee}}
                     ¥ {{g.price}}
                 </div>
                 <div class="goods_action">
-                    <div class="sell-btn">
+                    <div class="sell-btn" onclick="test()">
                         Sell out
                     </div>
                 </div>
@@ -174,4 +175,41 @@ Trans - Playing: {{name}} | Fee Left: ¥ {{fee}}
         </div>
     </div>
 </div>
+
+<script>
+    var pid = "{{pid}}";
+    var pk = "{{pk}}"
+    var ws_scheme = window.location.protocol == "https:" ? "wss" : "ws";
+    var socket = new WebSocket(ws_scheme + '://' + window.location.host + "/ex/" + pid + "/" + pk);
+
+    // Handle any errors that occur.
+    socket.onerror = function (error) {
+        console.log('WebSocket Error: ' + error);
+    };
+    // Show a connected message when the WebSocket is opened.
+    socket.onopen = function (event) {
+        console.log('connected to oTree');
+    };
+    // Handle messages sent by the server.
+    socket.onmessage = function (event) {
+        var obj = jQuery.parseJSON(event.data);
+        console.log('new msg:', obj);
+    };
+    socket.onclose = function (event) {
+        console.log('disconnected from oTree');
+    };
+
+
+
+    function test() {
+        var pid = "{{pid}}"
+        var msg = {id:pid, action: 'do something'};
+        if (socket.readyState === socket.OPEN) {
+            console.log('send msg:',msg);
+            socket.send(JSON.stringify(msg));
+        }
+    }
+
+</script>
+
 {% endblock %}

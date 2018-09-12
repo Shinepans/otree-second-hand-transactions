@@ -29,6 +29,8 @@ class Trans(Page):
         for g in goods_id_array:
             goods_array.append(goods[int(g)])
         return {
+            'pk': self.player.pk,
+            'pid': self.participant.id,
             'name': self.player.name,
             'fee': self.player.fee,
             'goods': goods_array
