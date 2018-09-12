@@ -137,7 +137,9 @@ Trans - Playing: {{name}} | Fee Left: ¥ {{fee}}
             font-size: 1rem;
             height: 4rem;
             border-bottom: solid 1px #eee;
-            margin-top: 0.5rem;
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
         }
 
 
@@ -150,7 +152,7 @@ Trans - Playing: {{name}} | Fee Left: ¥ {{fee}}
         <div class="goods_title">
             You own goods:
         </div>
-        <div class="goods_block">
+        <div id="goods_block" class="goods_block">
             {% for g in goods %}
             <div class="goods_item">
                 <div class="goods_name">
@@ -205,11 +207,19 @@ Trans - Playing: {{name}} | Fee Left: ¥ {{fee}}
         console.log('new msg:', obj);
         if(obj.action == 'syn_sell_list') {
             sell_list = obj.sell_list
+            my_goods = obj.my_goods
             $("div").remove(".sell_list_item")
+            $("div").remove(".goods_item")
             for(var idx=0;idx<sell_list.length;idx++) {
                 $('#sell_list').after("<div class='sell_list_item'><span style='color:#333'>"
                 + sell_list[idx].name + "</span><span style='color:#4caf50;position:absolute;right:6rem'>¥ " + sell_list[idx].price +
-                "</span><a onclick='buy(" + sell_list[idx].id + ")' style='color:#2196f3;position: absolute;right: 2rem;'>Buy it</a></div>")
+                "</span><a onclick='buy(" + sell_list[idx].id + ")' style='cursor:pointer;color:#2196f3;position: absolute;right: 2rem;'>Buy it</a></div>")
+            }
+            for (var idx=0;idx<my_goods.length;idx++) {
+                $('#goods_block').append("<div class='goods_item'><div class='goods_name'>"+my_goods[idx].name
+                +"</div><div class='goods_price'>¥ "+my_goods[idx].price
+                +"</div><div class='goods_action'><div class='sell-btn' onclick='actions("+my_goods[idx].id
+                +")'>Sell out</div></div></div>")
             }
         }
     };
@@ -222,6 +232,16 @@ Trans - Playing: {{name}} | Fee Left: ¥ {{fee}}
     function actions(id) {
         var pid = "{{pid}}";
         var msg = {id:pid, action: 'sell_or_buy', goods_id: id};
+        if (socket.readyState === socket.OPEN) {
+            console.log('send msg:',msg);
+            socket.send(JSON.stringify(msg));
+        }
+    }
+
+    // buy the goods
+    function buy(id) {
+        var pid = "{{pid}}"
+        var msg = {id: pid, action: 'buy_goods', goods_id: id}
         if (socket.readyState === socket.OPEN) {
             console.log('send msg:',msg);
             socket.send(JSON.stringify(msg));

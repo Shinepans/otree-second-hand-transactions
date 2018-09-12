@@ -3,9 +3,18 @@ from pprint import pprint
 import json
 from .models import Player
 from .goods_conf import goods
+from .goods_conf import encode_goods_idx, decode_goods_idx
 
 replychannels = {}
 goods_list = []
+
+def findGoods(pid):
+    p = Player.objects.get(participant_id=pid)
+    p_goods_id_arr = decode_goods_idx(p.goods_id)
+    p_goods_arr = []
+    for id in p_goods_id_arr:
+        p_goods_arr.append(goods[int(id)])
+    return p_goods_arr
 
 class ExConsumer(JsonWebsocketConsumer):
 
@@ -40,14 +49,23 @@ class ExConsumer(JsonWebsocketConsumer):
             global goods_list
             all_players_id = [content['id']]
             goods_item = goods[int(content['goods_id'])]
+            this_player = Player.objects.get(participant_id=content['id'])
+            # update player's goodsID, decode,update,encode
             if goods_item not in goods_list:
                 goods_list.append(goods_item)
-            for p in Player.get_others_in_group(Player.objects.get(participant_id=content['id'])):
+                this_player_goods_array = decode_goods_idx(this_player.goods_id)
+                this_player_goods_array.remove(goods_item['id'])
+                this_player.goods_id = encode_goods_idx(this_player_goods_array)
+                this_player.save()
+            for p in Player.get_others_in_group(this_player):
                 all_players_id.append(p.id)
-            for id in all_players_id:
-                replychannels[str(id)].send({'text': json.dumps({
+            for pid in all_players_id:
+                replychannels[str(pid)].send({'text': json.dumps({
                     'action': 'syn_sell_list',
-                    'sell_list': goods_list
+                    'sell_list': goods_list,
+                    'my_goods': findGoods(pid)
                 })})
+        if content['action'] == 'buy_goods':
+            pass
         pass
 
