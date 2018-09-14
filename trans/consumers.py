@@ -79,12 +79,11 @@ class ExConsumer(JsonWebsocketConsumer):
             this_player_goods_array.append(goods_item['id'])
             this_player.goods_id = encode_goods_idx(this_player_goods_array)
             if this_player.fee < goods_item['price']:
-                replychannels[str(content['id'])].send({'text': json.dumps({
+                return replychannels[str(content['id'])].send({'text': json.dumps({
                     'action': 'msg',
                     'msg': 'Balance not enough'
                 })})
-                pass
-            this_player.fee -= goods[int(content['goods_id'])].price
+            this_player.fee -= goods[int(content['goods_id'])]['price']
             this_player.save()
             goods_list.remove(goods[int(content['goods_id'])])
             all_players_id = [content['id']]
