@@ -210,12 +210,16 @@ Trans - Playing: {{name}} | Fee Left: ¥ {{fee}}
     // Handle messages sent by the server.
     socket.onmessage = function (event) {
         var obj = jQuery.parseJSON(event.data);
+        var sell_list
         console.log('new msg:', obj);
         if(obj.action == 'syn_sell_list') {
             sell_list = obj.sell_list
             my_goods = obj.my_goods
+            var textVal = $('h2').text()
+            textVal = textVal.split('¥')[0] + '¥' + obj.my_fee
             $("div").remove(".sell_list_item")
             $("div").remove(".goods_item")
+            $('h2').text(textVal)
             for(var idx=0;idx<sell_list.length;idx++) {
                 $('#sell_list').after("<div class='sell_list_item'><span style='color:#333'>"
                 + sell_list[idx].name + "</span><span style='color:#4caf50;position:absolute;right:6rem'>¥ " + sell_list[idx].price +
@@ -227,6 +231,9 @@ Trans - Playing: {{name}} | Fee Left: ¥ {{fee}}
                 +"</div><div class='goods_action'><div class='sell-btn' onclick='actions("+my_goods[idx].id
                 +")'>Sell out</div></div></div>")
             }
+        }
+        if (obj.action == 'msg') {
+            alert(obj.msg);
         }
     };
     socket.onclose = function (event) {

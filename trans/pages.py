@@ -9,7 +9,6 @@ from .goods_conf import goods
 
 class Instructions(Page):
     def vars_for_template(self):
-        pprint(vars(self.player))
         return {
             'name': self.player.name,
             'fee': self.player.fee

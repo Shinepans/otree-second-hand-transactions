@@ -16,6 +16,10 @@ def findGoods(pid):
         p_goods_arr.append(goods[int(id)])
     return p_goods_arr
 
+def findFee(pid):
+    p = Player.objects.get(participant_id=pid)
+    return p.fee
+
 class ExConsumer(JsonWebsocketConsumer):
 
     def clean_kwargs(self, pid, pk):
@@ -44,6 +48,7 @@ class ExConsumer(JsonWebsocketConsumer):
         kwargs = self.clean_kwargs(**kwargs)
         self.post_receive(content, **kwargs)
 
+    # the place to deal with actions from players
     def post_receive(self, content, pid, pk):
         if content['action'] == 'sell_or_buy':
             global goods_list
@@ -56,6 +61,7 @@ class ExConsumer(JsonWebsocketConsumer):
                 this_player_goods_array = decode_goods_idx(this_player.goods_id)
                 this_player_goods_array.remove(goods_item['id'])
                 this_player.goods_id = encode_goods_idx(this_player_goods_array)
+                this_player.fee += goods_item['price']
                 this_player.save()
             for p in Player.get_others_in_group(this_player):
                 all_players_id.append(p.id)
@@ -63,14 +69,33 @@ class ExConsumer(JsonWebsocketConsumer):
                 replychannels[str(pid)].send({'text': json.dumps({
                     'action': 'syn_sell_list',
                     'sell_list': goods_list,
-                    'my_goods': findGoods(pid)
+                    'my_goods': findGoods(pid),
+                    'my_fee': findFee(pid)
                 })})
         if content['action'] == 'buy_goods':
+            goods_item = goods[int(content['goods_id'])]
             this_player = Player.objects.get(participant_id=content['id'])
             this_player_goods_array = decode_goods_idx(this_player.goods_id)
             this_player_goods_array.append(goods_item['id'])
             this_player.goods_id = encode_goods_idx(this_player_goods_array)
-            # TODO find owner; dec my fee, inc his fee
+            if this_player.fee < goods_item['price']:
+                replychannels[str(content['id'])].send({'text': json.dumps({
+                    'action': 'msg',
+                    'msg': 'Balance not enough'
+                })})
+                pass
+            this_player.fee -= goods[int(content['goods_id'])].price
             this_player.save()
+            goods_list.remove(goods[int(content['goods_id'])])
+            all_players_id = [content['id']]
+            for p in Player.get_others_in_group(this_player):
+                all_players_id.append(p.id)
+            for pid in all_players_id:
+                replychannels[str(pid)].send({'text': json.dumps({
+                    'action': 'syn_sell_list',
+                    'sell_list': goods_list,
+                    'my_goods': findGoods(pid),
+                    'my_fee': findFee(pid)
+                })})
         pass
 
